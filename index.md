@@ -1,37 +1,69 @@
-## Welcome to GitHub Pages
+## 蛙蛙工具
+[https://www.iamwawa.cn/](特殊符号大全、英文字母大小写转换、文本转HTML工具)
 
-You can use the [editor on GitHub](https://github.com/1998JunBin/1998JunBin.github.io/edit/main/index.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## 搜图导航
+[https://www.91sotu.com/](种类全，界面一目了然)
 
-### Markdown
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## 网站测速
+[https://www.iamwawa.cn/](操作简单，检测速度快)
 
-```markdown
-Syntax highlighted code block
 
-# Header 1
-## Header 2
-### Header 3
+## bigjpg
+[https://bigjpg.com/](无损放大，功能强大，适用于logo等矢量图)
 
-- Bulleted
-- List
 
-1. Numbered
-2. List
+## css动画生成器
+[https://animista.net/](简单的css动画生成器、免费、操作简单、动画类型丰富)
 
-**Bold** and _Italic_ and `Code` text
 
-[Link](url) and ![Image](src)
-```
+## 零代码工具箱
+[https://lingdaima.com/](功能强大)
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
 
-### Jekyll Themes
+## 简单重复性的SVG图案在线生成器
+[https://cn.pattern.monster/]()
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/1998JunBin/1998JunBin.github.io/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
-### Support or Contact
+## 简单重复性的SVG图案在线生成器
+[https://cn.pattern.monster/]()
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+
+## 配色网站
+[https://mycolor.space/](自动生成多种颜色搭配)
+
+
+
+## 图片在线压缩
+[https://docsmall.com/image-compress](压缩质量高、免费、界面简洁)
+
+
+
+## 贝塞尔曲线生成器
+[https://cubic-bezier.com/#.17,.67,.83,.67](动画过渡的贝塞尔曲线生成器)
+
+
+
+## 摸鱼网站
+[https://aidn.jp/mikutap/]()
+
+
+
+## 品牌收集网
+[https://www.maigoo.com]()
+
+
+
+## 法律咨询
+[https://ai.12348.gov.cn/pc/]()
+
+
+
+## Adobe全系软件下载
+[http://adobe.v404.cn/adobe/]()
+
+
+
+## 随机跳出一个无用网站
+[https://theuselessweb.com/]()

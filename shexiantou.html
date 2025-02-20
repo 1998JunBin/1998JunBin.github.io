@@ -77,20 +77,22 @@
                             return;
                         }
                         
-                        // 显示结果
-                        resultContainer.innerHTML = `<p>扫描结果：</p><pre>${result.text}</pre>`;
-                        
-                        // 如果是URL则添加链接
-                        if (result.text.startsWith('http')) {
-                            const link = document.createElement('a');
-                            link.href = result.text;
-                            link.textContent = result.text;
-                            link.target = '_blank';
-                            resultContainer.appendChild(link);
+                        if (result) {
+                            // 显示结果
+                            resultContainer.innerHTML = `<p>扫描结果：</p><pre>${result.text}</pre>`;
+                            
+                            // 如果是URL则添加链接
+                            if (result.text.startsWith('http')) {
+                                const link = document.createElement('a');
+                                link.href = result.text;
+                                link.textContent = result.text;
+                                link.target = '_blank';
+                                resultContainer.appendChild(link);
+                            }
+                            
+                            // 停止视频流和关闭摄像头
+                            stream.getTracks().forEach(track => track.stop());
                         }
-                        
-                        // 关闭摄像头
-                        stream.getTracks().forEach(track => track.stop());
                     });
                 } catch (err) {
                     console.error("摄像头访问失败:", err);

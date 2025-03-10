@@ -3,36 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>扫码解析</title>
+    <title>批量扫码解析</title>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        h2 {
+            color: #333;
+        }
         #reader {
             width: 100%;
             max-width: 400px;
-            margin: auto;
-            display: none;
-        }
-        #scan-button {
-            display: block;
             margin: 20px auto;
-            padding: 10px 20px;
+            display: none;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            padding: 10px;
+            background-color: white;
+        }
+        .button {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 20px;
             font-size: 16px;
             background-color: #007bff;
             color: white;
             border: none;
             cursor: pointer;
             border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        #result-container {
+            margin-top: 20px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: auto;
+        }
+        .result-item {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            font-size: 18px;
+            color: #333;
+        }
+        .result-item:last-child {
+            border-bottom: none;
         }
     </style>
 </head>
 <body>
-    <h2>扫描二维码</h2>
-    <button id="scan-button">点击扫码</button>
+    <h2>批量扫码解析</h2>
+    <button id="scan-button" class="button">点击扫码</button>
+    <button id="clear-button" class="button" style="display: none; background-color: #dc3545;">清空记录</button>
     <div id="reader"></div>
-    <p>解析后的内容：<span id="result"></span></p>
+    <div id="result-container">
+        <h3>解析结果</h3>
+        <div id="result-list"></div>
+    </div>
 
     <script>
         let html5QrCode;
+        let scannedResults = [];
 
         function extractLastPathSegment(url) {
             try {
@@ -47,17 +87,23 @@
 
         function onScanSuccess(decodedText, decodedResult) {
             let extractedText = extractLastPathSegment(decodedText);
-            document.getElementById('result').innerText = extractedText;
-            document.getElementById('reader').style.display = 'none';
-            document.getElementById('scan-button').style.display = 'block';
-            html5QrCode.stop();
+            if (!scannedResults.includes(extractedText)) {
+                scannedResults.push(extractedText);
+                let resultList = document.getElementById('result-list');
+                let listItem = document.createElement('div');
+                listItem.className = 'result-item';
+                listItem.textContent = extractedText;
+                resultList.appendChild(listItem);
+                document.getElementById('clear-button').style.display = 'inline-block';
+            }
         }
 
         function startScanner() {
             document.getElementById('reader').style.display = 'block';
             document.getElementById('scan-button').style.display = 'none';
-
-            html5QrCode = new Html5Qrcode("reader");
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("reader");
+            }
             html5QrCode.start(
                 { facingMode: "environment" },
                 {
@@ -71,7 +117,14 @@
             });
         }
 
+        function clearResults() {
+            scannedResults = [];
+            document.getElementById('result-list').innerHTML = '';
+            document.getElementById('clear-button').style.display = 'none';
+        }
+
         document.getElementById('scan-button').addEventListener('click', startScanner);
+        document.getElementById('clear-button').addEventListener('click', clearResults);
     </script>
 </body>
 </html>

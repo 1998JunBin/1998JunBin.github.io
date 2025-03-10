@@ -1,111 +1,46 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>二维码扫描器</title>
+    <title>扫码解析</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
-        #qrcode-scanner {
-            position: relative;
+        #reader {
             width: 100%;
-            max-width: 600px;
-            margin: 20px auto;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        video {
-            width: 100%;
-            height: 300px;
-            object-fit: contain;
-        }
-        
-        .scan-button {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        
-        .result-container {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f8f9fa;
+            max-width: 400px;
+            margin: auto;
         }
     </style>
 </head>
 <body>
-    <div id="qrcode-scanner">
-        <video id="videoStream" autoplay playsinline></video>
-        <button class="scan-button">扫描二维码</button>
-        <div class="result-container" id="result"></div>
-    </div>
+    <h2>扫描二维码</h2>
+    <div id="reader"></div>
+    <p>扫描结果：<span id="result"></span></p>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxing/0.13.0/zxing.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const video = document.getElementById('videoStream');
-            const scanButton = document.querySelector('.scan-button');
-            const resultContainer = document.getElementById('result');
-            
-            // 移动端检测
-            if (!('ontouchstart' in window) || !navigator.userAgent.match(/Mobi|Android/i)) {
-                scanButton.style.display = 'none';
-                resultContainer.innerHTML = '<p>请在移动设备上使用此功能</p>';
-                return;
-            }
+        function onScanSuccess(decodedText, decodedResult) {
+            document.getElementById('result').innerText = decodedText;
+            alert("扫码成功: " + decodedText);
+        }
 
-            // 请求摄像头权限
-            scanButton.addEventListener('click', async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                    video.srcObject = stream;
-                    
-                    // 初始化二维码扫描器
-                    const codeReader = new ZXing.BrowserQRCodeReader();
-                    codeReader.decodeFromVideoDevice(stream, (result, error) => {
-                        if (error) {
-                            console.error("二维码解析错误:", error);
-                            return;
-                        }
-                        
-                        if (result) {
-                            // 显示结果
-                            resultContainer.innerHTML = `<p>扫描结果：</p><pre>${result.text}</pre>`;
-                            
-                            // 如果是URL则添加链接
-                            if (result.text.startsWith('http')) {
-                                const link = document.createElement('a');
-                                link.href = result.text;
-                                link.textContent = result.text;
-                                link.target = '_blank';
-                                resultContainer.appendChild(link);
-                            }
-                            
-                            // 停止视频流和关闭摄像头
-                            stream.getTracks().forEach(track => track.stop());
-                        }
-                    });
-                } catch (err) {
-                    console.error("摄像头访问失败:", err);
-                    alert("无法访问摄像头，请检查权限设置");
-                }
-            });
+        function onScanFailure(error) {
+            // 可以在控制台查看错误信息
+            console.warn(`扫码失败: ${error}`);
+        }
 
-            // 处理页面可见性变化（离开时关闭摄像头）
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden) {
-                    video.srcObject && video.srcObject.getTracks().forEach(track => track.stop());
-                }
-            });
+        let html5QrCode = new Html5Qrcode("reader");
+        
+        html5QrCode.start(
+            { facingMode: "environment" }, // 使用后置摄像头
+            {
+                fps: 10,    // 每秒扫描次数
+                qrbox: { width: 250, height: 250 } // 扫描框大小
+            },
+            onScanSuccess,
+            onScanFailure
+        ).catch(err => {
+            console.error("摄像头访问失败", err);
         });
     </script>
 </body>

@@ -142,26 +142,23 @@
 
         let html5QrCode;
         function startScan() {
-            document.getElementById("start-scan").style.display = "none";
+    document.getElementById("start-scan").style.display = "none";
 
-            html5QrCode = new Html5Qrcode("reader");
-            html5QrCode.start(
-                { facingMode: "environment" }, 
-                { fps: 10, qrbox: 250 },
-                (decodedText) => {
-                    let lastPart = decodedText.split('/').pop();
-                    if (scannedResults.has(lastPart)) {
-                        showAlert("该型号已存在，请勿重复添加");
-                        return;
-                    }
-                    addResult(lastPart);
-                    showAlert(`扫码成功：${lastPart}`);
-                    stopScan();
-                }
-            ).catch(err => {
-                console.error(err);
-            });
+    html5QrCode = new Html5Qrcode("reader");
+    html5QrCode.start(
+        { facingMode: "environment" }, 
+        { fps: 10, qrbox: 250 },
+        (decodedText) => {
+            let lastPart = decodedText.split('/').pop();
+            addResult(lastPart);
+            showAlert(`扫码成功：${lastPart}`);
+            stopScan();
         }
+    ).catch(err => {
+        console.error(err);
+    });
+}
+
 
         function stopScan() {
             if (html5QrCode) {
@@ -174,23 +171,23 @@
             }
         }
 
-        function addResult(result) {
-            scannedResults.add(result);
-            let tbody = document.getElementById("result-list");
-            let row = tbody.insertRow();
-            let cell1 = row.insertCell(0);
-            let cell2 = row.insertCell(1);
-            let cell3 = row.insertCell(2);
+       function addResult(result) {
+    let tbody = document.getElementById("result-list");
+    let row = tbody.insertRow();
+    let cell1 = row.insertCell(0);
+    let cell2 = row.insertCell(1);
+    let cell3 = row.insertCell(2);
 
-            cell1.textContent = tbody.rows.length;
-            cell2.textContent = result;
+    cell1.textContent = tbody.rows.length;
+    cell2.textContent = result;
 
-            let deleteBtn = document.createElement("button");
-            deleteBtn.className = "btn btn-red";
-            deleteBtn.textContent = "删除";
-            deleteBtn.onclick = () => deleteResult(row, result);
-            cell3.appendChild(deleteBtn);
-        }
+    let deleteBtn = document.createElement("button");
+    deleteBtn.className = "btn btn-red";
+    deleteBtn.textContent = "删除";
+    deleteBtn.onclick = () => deleteResult(row);
+    cell3.appendChild(deleteBtn);
+}
+
 
         function deleteResult(row, result) {
             scannedResults.delete(result);

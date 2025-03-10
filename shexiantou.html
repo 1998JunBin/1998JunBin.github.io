@@ -10,15 +10,30 @@
             width: 100%;
             max-width: 400px;
             margin: auto;
+            display: none;
+        }
+        #scan-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <h2>扫描二维码</h2>
+    <button id="scan-button">点击扫码</button>
     <div id="reader"></div>
     <p>解析后的内容：<span id="result"></span></p>
 
     <script>
+        let html5QrCode;
+
         function extractLastPathSegment(url) {
             try {
                 let urlObj = new URL(url);
@@ -33,26 +48,30 @@
         function onScanSuccess(decodedText, decodedResult) {
             let extractedText = extractLastPathSegment(decodedText);
             document.getElementById('result').innerText = extractedText;
-            alert("解析成功: " + extractedText);
+            document.getElementById('reader').style.display = 'none';
+            document.getElementById('scan-button').style.display = 'block';
+            html5QrCode.stop();
         }
 
-        function onScanFailure(error) {
-            console.warn(`扫码失败: ${error}`);
+        function startScanner() {
+            document.getElementById('reader').style.display = 'block';
+            document.getElementById('scan-button').style.display = 'none';
+
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                },
+                onScanSuccess,
+                (error) => console.warn(`扫码失败: ${error}`)
+            ).catch(err => {
+                console.error("摄像头访问失败", err);
+            });
         }
 
-        let html5QrCode = new Html5Qrcode("reader");
-        
-        html5QrCode.start(
-            { facingMode: "environment" },
-            {
-                fps: 10,
-                qrbox: { width: 250, height: 250 }
-            },
-            onScanSuccess,
-            onScanFailure
-        ).catch(err => {
-            console.error("摄像头访问失败", err);
-        });
+        document.getElementById('scan-button').addEventListener('click', startScanner);
     </script>
 </body>
 </html>

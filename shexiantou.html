@@ -17,8 +17,8 @@
         .btn {
             display: inline-block;
             margin-top: 10px;
-            padding: 10px 15px;
-            font-size: 18px;
+            padding: 8px 12px;
+            font-size: 14px; /* 调整文字大小 */
             color: white;
             border: none;
             border-radius: 5px;
@@ -28,7 +28,7 @@
         .btn-green:hover { background-color: #14501e; }
         .btn-gray { background-color: #888; }
         .btn-gray:hover { background-color: #666; }
-        .btn-red { background-color: #d9534f; } /* 删除按钮 */
+        .btn-red { background-color: #d9534f; }
         .btn-red:hover { background-color: #c9302c; }
         #button-group {
             display: flex;
@@ -37,9 +37,10 @@
             margin-bottom: 20px;
         }
         table {
-            width: 80%;
+            width: 95%; /* 调整表格宽度 */
             margin: 20px auto;
             border-collapse: collapse;
+            font-size: 14px; /* 调整文字大小 */
         }
         table, th, td {
             border: 1px solid #ddd;
@@ -56,10 +57,9 @@
             padding: 15px;
             background: #f9f9f9;
             border-radius: 5px;
-            width: 80%;
-            margin-left: auto;
-            margin-right: auto;
+            width: 95%;
             text-align: left;
+            font-size: 14px; /* 统一文字大小 */
         }
     </style>
 </head>
@@ -116,9 +116,8 @@
     </div>
 
     <script>
-        let scannedResults = new Set(); // 用于存储去重后的扫码内容
+        let scannedResults = new Set(); // 记录已扫码的内容
 
-        // 设备检测
         function detectDevice() {
             let isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
             let isSecure = location.protocol === 'https:';
@@ -132,7 +131,6 @@
             }
         }
 
-        // 复制网址
         function copyURL() {
             let url = window.location.href;
             navigator.clipboard.writeText(url).then(() => {
@@ -144,7 +142,7 @@
 
         let html5QrCode;
         function startScan() {
-            document.getElementById("start-scan").style.display = "none"; // 开始扫码按钮消失
+            document.getElementById("start-scan").style.display = "none";
 
             html5QrCode = new Html5Qrcode("reader");
             html5QrCode.start(
@@ -153,12 +151,12 @@
                 (decodedText) => {
                     let lastPart = decodedText.split('/').pop();
                     if (scannedResults.has(lastPart)) {
-                        alert("该型号已存在，请勿重复添加");
+                        showAlert("该型号已存在，请勿重复添加");
                         return;
                     }
                     addResult(lastPart);
-                    alert(`扫码成功：${lastPart}`);
-                    stopScan(); // 自动关闭扫码
+                    showAlert(`扫码成功：${lastPart}`);
+                    stopScan();
                 }
             ).catch(err => {
                 console.error(err);
@@ -169,7 +167,7 @@
             if (html5QrCode) {
                 html5QrCode.stop().then(() => {
                     document.getElementById("reader").innerHTML = "";
-                    document.getElementById("start-scan").style.display = "inline-block"; // 重新显示“开始扫码”按钮
+                    document.getElementById("start-scan").style.display = "inline-block";
                 }).catch(err => {
                     console.error(err);
                 });
@@ -177,16 +175,15 @@
         }
 
         function addResult(result) {
-            scannedResults.add(result); // 记录数据
-
+            scannedResults.add(result);
             let tbody = document.getElementById("result-list");
             let row = tbody.insertRow();
             let cell1 = row.insertCell(0);
             let cell2 = row.insertCell(1);
             let cell3 = row.insertCell(2);
 
-            cell1.textContent = tbody.rows.length; // 序号
-            cell2.textContent = result; // 扫码内容
+            cell1.textContent = tbody.rows.length;
+            cell2.textContent = result;
 
             let deleteBtn = document.createElement("button");
             deleteBtn.className = "btn btn-red";
@@ -208,10 +205,14 @@
         function confirmSubmit() {
             let resultList = document.getElementById("result-list").rows.length;
             if (resultList === 0) {
-                alert("请先扫码！");
+                showAlert("请先扫码！");
             } else {
-                alert("数据提交成功！（暂未实现提交逻辑）");
+                showAlert("数据提交成功！（暂未实现提交逻辑）");
             }
+        }
+
+        function showAlert(message) {
+            setTimeout(() => alert(message), 50); // 防止弹窗重复触发
         }
 
         detectDevice();

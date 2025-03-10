@@ -1,185 +1,116 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>批量扫码解析</title>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f4f4f4;
-            padding: 20px;
+import QrScanner from "qr-scanner";
+import { useEffect, useRef, useState } from "react";
+
+export default function QRCodeScanner() {
+  const videoRef = useRef(null);
+  const scannerRef = useRef(null);
+  const [scannedResults, setScannedResults] = useState([]);
+  const [showScanner, setShowScanner] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
+  const [hasSSL, setHasSSL] = useState(true);
+
+  useEffect(() => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    setIsMobile(/mobile|android|iphone|ipad/.test(userAgent));
+    setHasSSL(window.location.protocol === "https:");
+  }, []);
+
+  useEffect(() => {
+    if (showScanner && isMobile && hasSSL) {
+      scannerRef.current = new QrScanner(
+        videoRef.current,
+        (result) => {
+          setScannedResults((prevResults) => [...prevResults, result.data.split("/").pop()]);
+          setShowAlert(true);
+          setAlertMessage(`解析成功：${result.data.split("/").pop()}`);
+          scannerRef.current.stop();
+          setShowScanner(false);
+        },
+        {
+          returnDetailedScanResult: true,
         }
-        h2 {
-            color: #333;
-        }
-        #reader {
-            width: 100%;
-            max-width: 400px;
-            margin: 20px auto;
-            display: none;
-        }
-        .button {
-            display: inline-block;
-            margin: 10px;
-            padding: 12px 20px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-        #result-container {
-            margin-top: 20px;
-            padding: 10px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            margin: auto;
-        }
-        .result-item {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-            font-size: 18px;
-            color: #333;
-        }
-        .result-item:last-child {
-            border-bottom: none;
-        }
-        #close-scan {
-            display: none;
-            margin-top: 10px;
-            background-color: #dc3545;
-        }
-        #success-alert {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-        }
-        #overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 999;
-        }
-    </style>
-</head>
-<body>
-    <script>
-        if (!/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
-            alert("请使用手机端打开此页面，电脑端无法使用扫码功能。");
-        }
-    </script>
-    <h2>批量扫码解析</h2>
-    <button id="scan-button" class="button">点击扫码</button>
-    <button id="clear-button" class="button" style="display: none; background-color: #dc3545;">清空记录</button>
-    <button id="close-scan" class="button">关闭扫码</button>
-    <div id="reader"></div>
-    <div id="result-container">
-        <h3>解析结果</h3>
-        <div id="result-list"></div>
+      );
+      scannerRef.current.start();
+    }
+    return () => scannerRef.current?.stop();
+  }, [showScanner, isMobile, hasSSL]);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setShowAlert(true);
+      setAlertMessage("复制成功");
+    });
+  };
+
+  if (!isMobile) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen text-center">
+        <p className="text-lg font-bold">请用手机端打开，电脑端扫码不可用</p>
+        <button
+          onClick={handleCopyLink}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+        >
+          复制网址
+        </button>
+      </div>
+    );
+  }
+
+  if (!hasSSL) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen text-center">
+        <p className="text-lg font-bold text-red-500">当前功能需要调用摄像头，页面需要安装SSL证书</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+      {showAlert && (
+        <div className="fixed top-0 left-0 w-full p-4 bg-white shadow-md text-center z-50">
+          <p className="text-lg">{alertMessage}</p>
+          <button
+            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            onClick={() => setShowAlert(false)}
+          >
+            确认
+          </button>
+        </div>
+      )}
+      <h1 className="text-2xl font-bold mb-4">二维码扫码解析</h1>
+      {!showScanner ? (
+        <button
+          onClick={() => setShowScanner(true)}
+          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+        >
+          开始扫码
+        </button>
+      ) : (
+        <div className="relative">
+          <video ref={videoRef} className="w-64 h-64" />
+          <button
+            onClick={() => setShowScanner(false)}
+            className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded"
+          >
+            关闭
+          </button>
+        </div>
+      )}
+      <ul className="mt-4 w-64 bg-white p-4 shadow rounded-lg">
+        {scannedResults.map((result, index) => (
+          <li key={index} className="border-b py-2">{result}</li>
+        ))}
+      </ul>
+      {scannedResults.length > 0 && (
+        <button
+          onClick={() => setScannedResults([])}
+          className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+        >
+          清空
+        </button>
+      )}
     </div>
-    <div id="overlay"></div>
-    <div id="success-alert">
-        <p>解析成功！</p>
-        <button onclick="closeSuccessAlert()" class="button">确认</button>
-    </div>
-    <script>
-        let html5QrCode;
-        let scannedResults = [];
-
-        function extractLastPathSegment(url) {
-            try {
-                let urlObj = new URL(url);
-                let pathSegments = urlObj.pathname.split("/");
-                return pathSegments.filter(segment => segment).pop();
-            } catch (error) {
-                console.error("URL 解析失败", error);
-                return "解析失败";
-            }
-        }
-
-        function onScanSuccess(decodedText, decodedResult) {
-            let extractedText = extractLastPathSegment(decodedText);
-            if (!scannedResults.includes(extractedText)) {
-                scannedResults.push(extractedText);
-                let resultList = document.getElementById('result-list');
-                let listItem = document.createElement('div');
-                listItem.className = 'result-item';
-                listItem.textContent = extractedText;
-                resultList.appendChild(listItem);
-                document.getElementById('clear-button').style.display = 'inline-block';
-                showSuccessAlert();
-            }
-        }
-
-        function startScanner() {
-            document.getElementById('reader').style.display = 'block';
-            document.getElementById('scan-button').style.display = 'none';
-            document.getElementById('close-scan').style.display = 'inline-block';
-            if (!html5QrCode) {
-                html5QrCode = new Html5Qrcode("reader");
-            }
-            html5QrCode.start(
-                { facingMode: "environment" },
-                {
-                    fps: 10,
-                    qrbox: { width: 250, height: 250 }
-                },
-                onScanSuccess,
-                (error) => console.warn(`扫码失败: ${error}`)
-            ).catch(err => {
-                console.error("摄像头访问失败", err);
-            });
-        }
-
-        function closeScanner() {
-            document.getElementById('reader').style.display = 'none';
-            document.getElementById('scan-button').style.display = 'inline-block';
-            document.getElementById('close-scan').style.display = 'none';
-            if (html5QrCode) {
-                html5QrCode.stop().catch(err => console.error("关闭扫码失败", err));
-            }
-        }
-
-        function clearResults() {
-            scannedResults = [];
-            document.getElementById('result-list').innerHTML = '';
-            document.getElementById('clear-button').style.display = 'none';
-        }
-
-        function showSuccessAlert() {
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('success-alert').style.display = 'block';
-        }
-
-        function closeSuccessAlert() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('success-alert').style.display = 'none';
-        }
-
-        document.getElementById('scan-button').addEventListener('click', startScanner);
-        document.getElementById('close-scan').addEventListener('click', closeScanner);
-        document.getElementById('clear-button').addEventListener('click', clearResults);
-    </script>
-</body>
-</html>
+  );
+}

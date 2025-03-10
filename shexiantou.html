@@ -16,26 +16,37 @@
 <body>
     <h2>扫描二维码</h2>
     <div id="reader"></div>
-    <p>扫描结果：<span id="result"></span></p>
+    <p>解析后的内容：<span id="result"></span></p>
 
     <script>
+        function extractLastPathSegment(url) {
+            try {
+                let urlObj = new URL(url);
+                let pathSegments = urlObj.pathname.split("/");
+                return pathSegments.filter(segment => segment).pop();
+            } catch (error) {
+                console.error("URL 解析失败", error);
+                return "解析失败";
+            }
+        }
+
         function onScanSuccess(decodedText, decodedResult) {
-            document.getElementById('result').innerText = decodedText;
-            alert("扫码成功: " + decodedText);
+            let extractedText = extractLastPathSegment(decodedText);
+            document.getElementById('result').innerText = extractedText;
+            alert("解析成功: " + extractedText);
         }
 
         function onScanFailure(error) {
-            // 可以在控制台查看错误信息
             console.warn(`扫码失败: ${error}`);
         }
 
         let html5QrCode = new Html5Qrcode("reader");
         
         html5QrCode.start(
-            { facingMode: "environment" }, // 使用后置摄像头
+            { facingMode: "environment" },
             {
-                fps: 10,    // 每秒扫描次数
-                qrbox: { width: 250, height: 250 } // 扫描框大小
+                fps: 10,
+                qrbox: { width: 250, height: 250 }
             },
             onScanSuccess,
             onScanFailure

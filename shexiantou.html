@@ -1,122 +1,182 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>批量扫码解析</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-        #scan-area, #error-message, #ssl-warning {
-            display: none;
-        }
-        .btn {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 8px 12px;
-            font-size: 14px; /* 调整文字大小 */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .btn-green { background-color: #1f612a; }
-        .btn-green:hover { background-color: #14501e; }
-        .btn-gray { background-color: #888; }
-        .btn-gray:hover { background-color: #666; }
-        .btn-red { background-color: #d9534f; }
-        .btn-red:hover { background-color: #c9302c; }
-        #button-group {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        table {
-            width: 95%; /* 调整表格宽度 */
-            margin: 20px auto;
-            border-collapse: collapse;
-            font-size: 14px; /* 调整文字大小 */
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: #f5f5f5;
-        }
-        .steps {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 5px;
-            width: 95%;
-            text-align: left;
-            font-size: 14px; /* 统一文字大小 */
-        }
-    </style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>批量扫码解析</title>
+	<script src="https://unpkg.com/html5-qrcode"></script>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+		}
+
+		#scan-area,
+		#error-message,
+		#ssl-warning {
+			display: none;
+		}
+
+		.btn1 {
+			display: inline-block;
+			margin-top: 10px;
+			padding: 8px 12px;
+			font-size: 14px;
+			/* 调整文字大小 */
+			color: white;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			text-align: center;
+		}
+
+		.btn-green {
+			background-color: #1f612a;
+		}
+
+		.btn-green:hover {
+			background-color: #14501e;
+		}
+
+		.btn-gray {
+			background-color: #888;
+		}
+
+		.btn-gray:hover {
+			background-color: #666;
+		}
+
+		.btn-red {
+			background-color: #d9534f;
+		}
+
+		.btn-red:hover {
+			background-color: #c9302c;
+		}
+
+		#button-group {
+			display: flex;
+			justify-content: center;
+			gap: 10px;
+			margin-bottom: 20px;
+		}
+
+		#result-list .btn{
+			font-size: 14px;
+			color: #fff;
+			background: red;
+		}
+
+		table {
+			width: 95%;
+			/* 调整表格宽度 */
+			margin: 20px auto;
+			border-collapse: collapse;
+			font-size: 14px;
+			/* 调整文字大小 */
+		}
+
+		table,
+		th,
+		td {
+			border: 1px solid #ddd;
+		}
+
+		th,
+		td {
+			padding: 10px;
+			text-align: center;
+		}
+
+		th {
+			background-color: #f5f5f5;
+		}
+
+		.steps {
+			margin: 0 auto;
+			padding: 15px;
+			background: #f9f9f9;
+			border-radius: 5px;
+			width: 95%;
+			text-align: left;
+			font-size: 14px;
+			/* 统一文字大小 */
+			margin-top: 20px;
+		}
+		.steps ol{
+			padding: 0 15px;
+			line-height: 1.8;
+		}
+		#scan-result {
+			margin-top: 20px;
+		}
+
+		#error-message p {
+			font-size: 22px;
+			color: red;
+			font-weight: bold;
+			margin-bottom: 14px;
+		}
+
+		#error-message button {
+			color: #fff;
+		}
+	</style>
 </head>
+
 <body>
 
-    <!-- 电脑端提示 -->
-    <div id="error-message">
-        <p>请用手机端打开，电脑端扫码不可用</p>
-        <button class="btn btn-green" onclick="copyURL()">复制网址</button>
-    </div>
+	<!-- 电脑端提示 -->
+	<div id="error-message">
+		<p>请用手机端打开，电脑端扫码不可用</p>
+		<button class="btn btn-green" onclick="copyURL()">复制网址</button>
+	</div>
 
-    <!-- SSL 证书提示 -->
-    <div id="ssl-warning">
-        <p>当前功能需要调用摄像头，页面需要安装 SSL 证书</p>
-    </div>
+	<!-- SSL 证书提示 -->
+	<div id="ssl-warning">
+		<p>当前功能需要调用摄像头，请先将页面配置SSL证书</p>
+	</div>
 
-    <!-- 手机端扫码区域 -->
-    <div id="scan-area">
-        <div id="button-group">
-            <button class="btn btn-gray" onclick="stopScan()">关闭扫码</button>
-            <button class="btn btn-green" onclick="startScan()" id="start-scan">开始扫码</button>
-        </div>
-        <div id="reader" style="width: 300px; margin: 20px auto;"></div>
-    </div>
+	<!-- 手机端扫码区域 -->
+	<div id="scan-area">
+		<div id="button-group">
+			<button class="btn btn-gray" onclick="stopScan()">关闭扫码</button>
+			<button class="btn btn-green" onclick="startScan()" id="start-scan">开始扫码</button>
+		</div>
+		<div id="reader" style="width: 300px; margin: 20px auto;"></div>
+	</div>
 
-    <!-- 扫码结果 -->
-    <div id="scan-result">
-        <h3>扫码结果</h3>
-        <table id="result-table">
-            <thead>
-                <tr>
-                    <th>序号</th>
-                    <th>扫码内容</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody id="result-list"></tbody>
-        </table>
-        <button class="btn btn-gray" onclick="clearResults()">清空记录</button>
-        <button class="btn btn-green" onclick="confirmSubmit()">确认提交</button>
+	<!-- 扫码结果 -->
+	<div id="scan-result">
+		<h3>扫码结果</h3>
+		<table id="result-table">
+			<thead>
+				<tr>
+					<th>序号</th>
+					<th>扫码内容</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody id="result-list"></tbody>
+		</table>
+		<button class="btn1 btn-gray" onclick="clearResults()">清空记录</button>
+		<button class="btn1 btn-green" onclick="confirmSubmit()">确认提交</button>
 
-        <!-- 使用步骤 -->
-        <div class="steps">
-            <h3>使用步骤：</h3>
-            <ol>
-                <li>点击“开始扫码”按钮，打开扫码功能。</li>
-                <li>将摄像头对准二维码，扫码成功后会自动解析。</li>
-                <li>扫码内容将显示在列表中，重复扫码不会添加相同型号。</li>
-                <li>如需删除单条记录，可点击“删除”按钮。</li>
-                <li>如需清空所有记录，点击“清空记录”按钮。</li>
-                <li>扫码完成后，点击“确认提交”按钮进行下一步操作。</li>
-            </ol>
-        </div>
-    </div>
+		<!-- 使用步骤 -->
+		<div class="steps">
+			<h3>使用步骤：</h3>
+			<ol>
+				<li>点击“开始扫码”按钮，打开扫码功能。</li>
+				<li>将摄像头对准二维码，扫码成功后会自动解析。</li>
+				<li>如需删除单条记录，可点击“删除”按钮。</li>
+				<li>如需清空所有记录，点击“清空记录”按钮。</li>
+				<li>扫码完成后，点击“确认提交”按钮进行下一步操作。</li>
+			</ol>
+		</div>
+	</div>
 
-    <script>
-        let scannedResults = new Set(); // 记录已扫码的内容
+	<script>
+        let scannedResults = new Set(); // 存储扫码结果
 
         function detectDevice() {
             let isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
@@ -132,33 +192,55 @@
         }
 
         function copyURL() {
-            let url = window.location.href;
-            navigator.clipboard.writeText(url).then(() => {
-                alert("复制成功");
-            }).catch(err => {
-                alert("复制失败，请手动复制");
-            });
+            const url = window.location.href;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert("复制成功");
+                }).catch(() => {
+                    fallbackCopy(url);
+                });
+            } else {
+                fallbackCopy(url);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                alert(successful ? '复制成功' : '复制失败，请手动复制');
+            } catch (err) {
+                alert('复制失败，请手动复制');
+            }
+            
+            document.body.removeChild(textArea);
         }
 
         let html5QrCode;
         function startScan() {
-    document.getElementById("start-scan").style.display = "none";
+            document.getElementById("start-scan").style.display = "none";
 
-    html5QrCode = new Html5Qrcode("reader");
-    html5QrCode.start(
-        { facingMode: "environment" }, 
-        { fps: 10, qrbox: 250 },
-        (decodedText) => {
-            let lastPart = decodedText.split('/').pop();
-            addResult(lastPart);
-            showAlert(`扫码成功：${lastPart}`);
-            stopScan();
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: 250 },
+                (decodedText) => {
+                    let lastPart = decodedText.split('/').pop();
+                    addResult(lastPart);
+                    matchAndClick(lastPart);
+                    showAlert(`扫码成功：${lastPart}`);
+                    stopScan();
+                }
+            ).catch(err => {
+                console.error(err);
+            });
         }
-    ).catch(err => {
-        console.error(err);
-    });
-}
-
 
         function stopScan() {
             if (html5QrCode) {
@@ -171,23 +253,20 @@
             }
         }
 
-       function addResult(result) {
-    let tbody = document.getElementById("result-list");
-    let row = tbody.insertRow();
-    let cell1 = row.insertCell(0);
-    let cell2 = row.insertCell(1);
-    let cell3 = row.insertCell(2);
+        function addResult(result) {
+            let tbody = document.getElementById("result-list");
+            let row = tbody.insertRow();
+            row.insertCell(0).textContent = tbody.rows.length;
+            row.insertCell(1).textContent = result;
 
-    cell1.textContent = tbody.rows.length;
-    cell2.textContent = result;
+            let deleteBtn = document.createElement("button");
+            deleteBtn.className = "btn btn-red";
+            deleteBtn.textContent = "删除";
+            deleteBtn.onclick = () => deleteResult(row, result);
+            row.insertCell(2).appendChild(deleteBtn);
 
-    let deleteBtn = document.createElement("button");
-    deleteBtn.className = "btn btn-red";
-    deleteBtn.textContent = "删除";
-    deleteBtn.onclick = () => deleteResult(row);
-    cell3.appendChild(deleteBtn);
-}
-
+            scannedResults.add(result);
+        }
 
         function deleteResult(row, result) {
             scannedResults.delete(result);
@@ -199,21 +278,62 @@
             document.getElementById("result-list").innerHTML = "";
         }
 
-        function confirmSubmit() {
-            let resultList = document.getElementById("result-list").rows.length;
-            if (resultList === 0) {
-                showAlert("请先扫码！");
-            } else {
-                showAlert("数据提交成功！（暂未实现提交逻辑）");
-            }
+		function confirmSubmit() {
+			if (scannedResults.size === 0) {
+				showAlert("请先扫码！");
+				return;
+			}
+
+
+			// 创建临时数组保存结果（避免遍历时修改Set）
+			const tempResults = [...scannedResults];
+			
+			// 逐个处理扫码结果
+			tempResults.forEach((scannedValue, index) => {
+				// 对特殊字符进行编码处理（适配value属性中的编码格式）
+				const encodedValue = encodeURIComponent(scannedValue)
+					.replace(/%2F/g, '%2F')
+					.replace(/%28/g, '(')
+					.replace(/%29/g, ')');
+
+				// 查找匹配项并触发点击
+				const $target = $(`.p_item_span[value="${encodedValue}"]`);
+				if ($target.length > 0) {
+					$target.closest('.select-picker-options-list-item').trigger('click');
+				}
+
+				// 最后一条处理完成后清空
+				if (index === tempResults.length - 1) {
+					clearResults();
+					showAlert("操作完成，已自动清空记录");
+					// 隐藏指定元素
+					$('#c_popbox-1741593192660').hide();
+				}
+			});
+		}
+
+        function matchAndClick(scannedValue) {
+            $(".p_item_span").each(function () {
+                if ($(this).attr("value") === scannedValue) {
+                    $(this).closest(".select-picker-options-list-item").trigger("click");
+                }
+            });
         }
 
         function showAlert(message) {
-            setTimeout(() => alert(message), 50); // 防止弹窗重复触发
+            setTimeout(() => alert(message), 50);
         }
 
         detectDevice();
-    </script>
+
+		// 页面加载完成后添加示例数据
+		window.onload = function () {
+			addResult("W2408-06624");
+			addResult("J2408-06622/A/B/C");
+		};
+
+	</script>
 
 </body>
+
 </html>

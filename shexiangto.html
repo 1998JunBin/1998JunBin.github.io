@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <button id="cameraButton">打开摄像头</button>
+    <video id="video" autoplay></video>
+    
+    <script>
+        document.getElementById('cameraButton').addEventListener('click', () => {
+            const video = document.getElementById('video');
+            if (navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(stream => {
+                        video.srcObject = stream;
+                    })
+                    .catch(err => {
+                        alert(`错误: ${err.message}`);
+                    });
+            } else {
+                alert('您的浏览器不支持摄像头访问');
+            }
+        });
+    </script>
+</body>
+</html>

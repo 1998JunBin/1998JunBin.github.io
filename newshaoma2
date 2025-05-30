@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style>
+			.container {
+				max-width: 100%;
+				max-height: 93vh;
+				background: white;
+				border-radius: 30px;
+				box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+				overflow: scroll;
+				margin-bottom: 20px;
+				flex: 1;
+				padding: 0;
+			}
+
+			header {
+				background: linear-gradient(90deg, #1a7b3a 0%, #2d8c42 100%);
+				color: white;
+				padding: 22px 20px 18px;
+				text-align: center;
+				position: relative;
+				border-radius: 20px 20px 0 0;
+			}
+
+			header h1 {
+				font-size: 1.8rem;
+				margin-bottom: 8px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 12px;
+				font-weight: 600;
+			}
+
+			header p {
+				font-size: 0.95rem;
+				opacity: 0.9;
+				max-width: 100%;
+				margin: 0 auto;
+				line-height: 1.5;
+			}
+
+			.device-warning {
+				background: #ffebee;
+				color: #c62828;
+				padding: 15px;
+				text-align: center;
+				border-radius: 12px;
+				margin: 15px;
+				display: none;
+				font-size: 0.95rem;
+			}
+
+			.ssl-warning {
+				background: #fff8e1;
+				color: #ff8f00;
+				padding: 15px;
+				text-align: center;
+				border-radius: 12px;
+				margin: 15px;
+				display: none;
+				font-size: 0.95rem;
+			}
+
+			.main-content {
+				display: flex;
+				flex-direction: column;
+				padding: 15px;
+				gap: 20px;
+			}
+
+			.scan-section {
+				background: #f8f9fa;
+				border-radius: 16px;
+				padding: 20px 15px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+			}
+
+			.results-section {
+				background: #f8f9fa;
+				border-radius: 16px;
+				padding: 20px 15px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.section-title {
+				display: flex;
+				align-items: center;
+				gap: 0px;
+				margin-bottom: 18px;
+				padding-bottom: 12px;
+				border-bottom: 2px solid #e0e6ed;
+				color: #1a7b3a;
+				font-size: 1.25rem;
+				font-weight: 600;
+			}
+
+			.section-title i {
+				font-size: 1.4rem;
+			}
+
+			#reader {
+				width: 100%;
+				height: 280px;
+				background: #e9ecef;
+				border-radius: 12px;
+				margin: 15px 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+				position: relative;
+			}
+
+			#reader video {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+
+			.scan-overlay {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				background: rgba(0, 0, 0, 0.4);
+				color: white;
+				font-size: 1.1rem;
+				text-align: center;
+				padding: 20px;
+			}
+
+			.scan-overlay i {
+				font-size: 3rem;
+				margin-bottom: 15px;
+				opacity: 0.8;
+			}
+
+			.scan-overlay p {
+				line-height: 1.5;
+				font-size: 16px;
+			}
+
+			.button-group {
+				display: flex;
+				gap: 12px;
+				flex-wrap: wrap;
+				margin-top: 15px;
+			}
+
+			.btn {
+				padding: 14px 20px;
+				border-radius: 50px;
+				border: none;
+				font-weight: 600;
+				font-size: 1rem;
+				cursor: pointer;
+				transition: all 0.2s ease;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+				flex: 1;
+				min-width: 120px;
+			}
+
+			.btn-primary {
+				background: linear-gradient(90deg, #1a7b3a 0%, #2d8c42 100%);
+				color: white;
+				box-shadow: 0 4px 12px rgba(26, 123, 58, 0.25);
+			}
+
+			.btn-primary:active {
+				background: linear-gradient(90deg, #156530 0%, #1f6e31 100%);
+				transform: translateY(2px);
+				box-shadow: 0 2px 6px rgba(26, 123, 58, 0.25);
+			}
+
+			.btn-secondary {
+				background: #5a6268;
+				color: white;
+				box-shadow: 0 4px 12px rgba(90, 98, 104, 0.2);
+			}
+
+			.btn-secondary:active {
+				background: #495057;
+				transform: translateY(2px);
+				box-shadow: 0 2px 6px rgba(90, 98, 104, 0.2);
+			}
+
+			.btn-danger {
+				background: #dc3545;
+				color: white;
+				box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+			}
+
+			.btn-danger:active {
+				background: #bd2130;
+				transform: translateY(2px);
+				box-shadow: 0 2px 6px rgba(220, 53, 69, 0.2);
+			}
+
+			.btn-success {
+				background: #28a745;
+				color: white;
+				box-shadow: 0 4px 12px rgba(40, 167, 69, 0.25);
+			}
+
+			.btn-success:active {
+				background: #218838;
+				transform: translateY(2px);
+				box-shadow: 0 2px 6px rgba(40, 167, 69, 0.25);
+			}
+
+			.results-container {
+				flex: 1;
+				overflow-y: auto;
+				margin: 15px 0;
+				border: 1px solid #e0e6ed;
+				border-radius: 12px;
+				background: white;
+				max-height: 300px;
+			}
+
+			.result-item {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 14px;
+				border-bottom: 1px solid #f1f3f5;
+				transition: background 0.2s;
+			}
+
+			.result-item:last-child {
+				border-bottom: none;
+			}
+
+			.result-content {
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+				flex: 1;
+				overflow: hidden;
+			}
+
+			.result-index {
+				font-weight: bold;
+				color: #1a7b3a;
+				min-width: 30px;
+				font-size: 1.1rem;
+			}
+
+			.result-text {
+				word-break: break-all;
+				font-size: 0.95rem;
+				line-height: 1.4;
+			}
+
+			.result-actions {
+				display: flex;
+				gap: 8px;
+			}
+
+			.action-btn {
+				background: none;
+				border: none;
+				color: #6c757d;
+				cursor: pointer;
+				font-size: 1.1rem;
+				transition: color 0.2s;
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.action-btn:active {
+				background: #f1f3f5;
+			}
+
+			.delete-btn:active {
+				color: #dc3545;
+			}
+
+			.copy-btn:active {
+				color: #007bff;
+			}
+
+			.results-summary {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 15px 0 10px;
+				font-size: 1.05rem;
+				border-top: 2px solid #e0e6ed;
+				margin-top: 5px;
+				gap: 10px;
+			}
+
+			.results-summary span {
+				font-weight: bold;
+				color: #1a7b3a;
+				font-size: 1.3rem;
+			}
+
+			.instructions {
+				background: #e8f5e9;
+				border-radius: 16px;
+				padding: 20px;
+				font-size: 0.95rem;
+				margin: 10px;
+			}
+
+			.instructions h3 {
+				color: #1a7b3a;
+				margin-bottom: 12px;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				font-size: 1.2rem;
+			}
+
+			.steps {
+				padding-left: 20px;
+			}
+
+			.steps li {
+				margin-bottom: 10px;
+				line-height: 1.6;
+			}
+
+			.status-indicator {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				margin-top: 12px;
+				padding: 12px;
+				border-radius: 10px;
+				background: #e3f2fd;
+				color: #0d47a1;
+				font-size: 0.95rem;
+			}
+
+			.status-indicator i {
+				font-size: 1.1rem;
+			}
+
+			.status-active {
+				background: #e8f5e9;
+				color: #1a7b3a;
+			}
+
+			.status-inactive {
+				background: #ffebee;
+				color: #c62828;
+			}
+
+			.empty-results {
+				text-align: center;
+				padding: 40px 20px;
+				color: #6c757d;
+				flex-direction: column;
+			}
+
+			.empty-results i {
+				font-size: 3rem;
+				margin-bottom: 15px;
+				opacity: 0.3;
+			}
+
+			.empty-results p {
+				font-size: 16px;
+				line-height: 1.5;
+			}
+
+			.highlight {
+				animation: highlight 1.5s ease;
+			}
+
+			@keyframes highlight {
+				0% {
+					background-color: rgba(126, 217, 87, 0.5);
+				}
+
+				100% {
+					background-color: transparent;
+				}
+			}
+
+			.notification {
+				position: fixed;
+				top: 20px;
+				left: 50%;
+				transform: translateX(-50%);
+				background: rgba(0, 0, 0, 0.85);
+				color: white;
+				padding: 14px 25px;
+				border-radius: 50px;
+				font-size: 1rem;
+				z-index: 1000;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				animation: fadeInOut 3s ease;
+				display: none;
+			}
+
+			@keyframes fadeInOut {
+
+				0%,
+				100% {
+					opacity: 0;
+					top: 10px;
+				}
+
+				10%,
+				90% {
+					opacity: 1;
+					top: 20px;
+				}
+			}
+
+			.footer {
+				text-align: center;
+				padding: 15px;
+				color: #6c757d;
+				font-size: 0.9rem;
+			}
+
+			.processing-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.7);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				z-index: 2000;
+				color: white;
+				display: none;
+			}
+
+			.spinner {
+				width: 50px;
+				height: 50px;
+				border: 5px solid rgba(255, 255, 255, 0.3);
+				border-radius: 50%;
+				border-top: 5px solid #fff;
+				animation: spin 1s linear infinite;
+				margin-bottom: 20px;
+			}
+
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
+				}
+
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+
+			/* 移动端特定优化 */
+			@media (max-width: 480px) {
+				header {
+					padding: 18px 15px 15px;
+				}
+
+				header h1 {
+					font-size: 1.6rem;
+				}
+
+				header p {
+					font-size: 0.9rem;
+				}
+
+				.btn {
+					padding: 10px;
+					font-size: 0.95rem;
+					min-width: 110px;
+				}
+
+				#reader {
+					height: 240px;
+				}
+
+				.section-title {
+					font-size: 1.15rem;
+				}
+
+				.results-container {
+					max-height: 250px;
+				}
+
+				.result-text {
+					font-size: 0.9rem;
+				}
+			}
+
+			@media (max-width: 360px) {
+				.button-group {
+					flex-direction: column;
+				}
+
+				.btn {
+					width: 100%;
+				}
+
+				#reader {
+					height: 200px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<script src="https://unpkg.com/html5-qrcode"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+		<div class="container">
+			<header>
+				<h1><i class="fas fa-qrcode"></i> 产品批量扫码工具</h1>
+				<p>扫描产品二维码，批量获取产品信息并提交</p>
+			</header>
+
+			<div class="device-warning" id="error-message">
+				<p><i class="fas fa-exclamation-triangle"></i> 请使用手机端打开此页面，电脑端无法调用摄像头</p>
+				<button class="btn btn-primary" onclick="copyURL()">
+					<i class="fas fa-copy"></i> 复制网址
+				</button>
+			</div>
+
+			<div class="ssl-warning" id="ssl-warning">
+				<p><i class="fas fa-lock"></i> 当前功能需要调用摄像头，请先将页面配置SSL证书</p>
+			</div>
+
+			<div class="main-content">
+				<section class="scan-section">
+					<h2 class="section-title"><i class="fas fa-camera"></i> 扫码区域</h2>
+
+					<div id="reader">
+						<div class="scan-overlay" id="scan-overlay">
+							<i class="fas fa-camera"></i>
+							<p>点击"开始扫码"按钮启动摄像头</p>
+						</div>
+					</div>
+
+					<div class="status-indicator" id="status-indicator">
+						<i class="fas fa-circle"></i>
+						<span>摄像头未启动</span>
+					</div>
+
+					<div class="button-group">
+						<button class="btn btn-primary" onclick="startScan()" id="start-scan">
+							<i class="fas fa-play"></i> 开始扫码
+						</button>
+						<button class="btn btn-secondary" onclick="stopScan()">
+							<i class="fas fa-stop"></i> 停止扫码
+						</button>
+					</div>
+				</section>
+
+				<section class="results-section">
+					<h2 class="section-title"><i class="fas fa-list"></i> 扫码结果</h2>
+
+					<div class="results-container" id="results-container">
+						<div class="empty-results" id="empty-results">
+							<i class="fas fa-inbox"></i>
+							<p>暂无扫码结果</p>
+							<p>请使用上方扫码区域添加产品</p>
+						</div>
+						<div id="result-list"></div>
+					</div>
+
+					<div class="results-summary">
+						<div>已扫描: <span id="results-count">0</span> 条</div>
+						<button class="btn btn-danger" onclick="clearResults()">
+							<i class="fas fa-trash-alt"></i> 清空
+						</button>
+					</div>
+
+					<div class="button-group">
+						<button class="btn btn-success" onclick="confirmSubmit()">
+							<i class="fas fa-paper-plane"></i> 确认提交
+						</button>
+					</div>
+				</section>
+			</div>
+
+			<div class="instructions">
+				<h3><i class="fas fa-info-circle"></i> 使用说明</h3>
+				<ol class="steps">
+					<li>点击"开始扫码"按钮，授权使用摄像头</li>
+					<li>将产品二维码置于扫描框内，保持稳定</li>
+					<li>扫码成功后将自动解析产品信息</li>
+					<li>可对单条记录进行复制或删除操作</li>
+					<li>扫描完成后，点击"确认提交"进行批量处理</li>
+				</ol>
+			</div>
+		</div>
+
+		<div class="footer">
+			<p>产品批量扫码工具 &copy; 2023</p>
+		</div>
+
+		<div class="notification" id="notification">
+			<i class="fas fa-check-circle"></i>
+			<span id="notification-text">操作成功</span>
+		</div>
+
+		<div class="processing-overlay" id="processing-overlay">
+			<div class="spinner"></div>
+			<h3>正在处理数据...</h3>
+			<p id="processing-text">请稍候，正在获取产品信息</p>
+		</div>
+		<script>
+			// 全局变量
+			let scannedResults = new Set(); // 存储扫码结果
+			let rawScannedURLs = new Set(); // 存储原始URL（未经编码处理）
+			let scanning = false;
+			let videoElement;
+			let canvasElement;
+
+			// 检测设备类型和SSL状态
+			function detectDevice() {
+				const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+				const isSecure = location.protocol === 'https:';
+
+				if (!isMobile) {
+					document.getElementById("error-message").style.display = "block";
+				} else if (!isSecure) {
+					document.getElementById("ssl-warning").style.display = "block";
+				}
+			}
+
+			// 复制当前URL
+			function copyURL() {
+				const url = window.location.href;
+
+				navigator.clipboard.writeText(url).then(() => {
+					showNotification("网址已复制到剪贴板");
+				}).catch(() => {
+					const textArea = document.createElement('textarea');
+					textArea.value = url;
+					document.body.appendChild(textArea);
+					textArea.select();
+					document.execCommand('copy');
+					document.body.removeChild(textArea);
+					showNotification("网址已复制到剪贴板");
+				});
+			}
+
+			// 初始化摄像头
+			function initCamera() {
+				videoElement = document.createElement('video');
+				videoElement.setAttribute('playsinline', '');
+				videoElement.style.width = '100%';
+				videoElement.style.height = '100%';
+				document.getElementById('reader').appendChild(videoElement);
+
+				canvasElement = document.createElement('canvas');
+			}
+
+			// 开始扫码
+			function startScan() {
+				document.getElementById("scan-overlay").style.display = "none";
+				document.getElementById("start-scan").disabled = true;
+
+				const constraints = {
+					video: {
+						facingMode: 'environment',
+						width: {
+							ideal: 1280
+						},
+						height: {
+							ideal: 720
+						},
+						frameRate: {
+							ideal: 30
+						}
+					}
+				};
+
+				navigator.mediaDevices.getUserMedia(constraints)
+					.then(stream => {
+						videoElement.srcObject = stream;
+						videoElement.play()
+							.then(() => {
+								scanning = true;
+								updateStatus(true);
+								scanFrame();
+							})
+							.catch(err => {
+								showNotification('摄像头启动失败: ' + err.message);
+								updateStatus(false);
+							});
+					})
+					.catch(err => {
+						showNotification('无法访问摄像头: ' + err.message);
+						updateStatus(false);
+						document.getElementById("start-scan").disabled = false;
+					});
+			}
+
+			// 停止扫码
+			function stopScan() {
+				scanning = false;
+				if (videoElement.srcObject) {
+					videoElement.srcObject.getTracks().forEach(track => track.stop());
+				}
+				document.getElementById("scan-overlay").style.display = "flex";
+				document.getElementById("start-scan").disabled = false;
+				updateStatus(false);
+			}
+
+			// 更新状态指示器
+			function updateStatus(isActive) {
+				const indicator = document.getElementById("status-indicator");
+				if (isActive) {
+					indicator.className = "status-indicator status-active";
+					indicator.innerHTML = '<i class="fas fa-circle"></i><span>摄像头运行中... 正在扫描二维码</span>';
+				} else {
+					indicator.className = "status-indicator status-inactive";
+					indicator.innerHTML = '<i class="fas fa-circle"></i><span>摄像头未启动</span>';
+				}
+			}
+
+			// 扫描帧处理
+			function scanFrame() {
+				if (!scanning) return;
+
+				const canvas = canvasElement;
+				const video = videoElement;
+
+				if (video.readyState >= video.HAVE_ENOUGH_DATA) {
+					canvas.width = video.videoWidth;
+					canvas.height = video.videoHeight;
+
+					const ctx = canvas.getContext('2d');
+					ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+					try {
+						const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+						const code = jsQR(imageData.data, imageData.width, imageData.height, {
+							inversionAttempts: 'dontInvert'
+						});
+
+						if (code) {
+							handleScannedResult(code.data);
+						}
+					} catch (e) {
+						console.warn('QR解析错误:', e);
+					}
+				}
+
+				requestAnimationFrame(scanFrame);
+			}
+
+			// 处理扫描结果
+			function handleScannedResult(decodedText) {
+				// 振动反馈
+				if (navigator.vibrate) navigator.vibrate(200);
+
+				// 原始数据存储
+				rawScannedURLs.add(decodedText);
+
+				// 数据解析逻辑
+				let parts = decodedText.split('.');
+				if (parts.length < 3 || parts[2].length < 4) {
+					showNotification("二维码格式不正确");
+					return;
+				}
+
+				let lastPart = parts[2].substr(4).replace(/-([A-Za-z])--/g, '($1)-');
+
+				// 添加到结果列表
+				addResult(lastPart);
+				showNotification(`扫码成功：${lastPart}`);
+				stopScan();
+			}
+
+			// 添加结果到列表
+			function addResult(result) {
+				document.getElementById("empty-results").style.display = "none";
+
+				const resultList = document.getElementById("result-list");
+				const row = document.createElement("div");
+				row.className = "result-item highlight";
+
+				// 创建序号
+				const index = scannedResults.size + 1;
+
+				row.innerHTML = `
+		                <div class="result-index">${index}</div>
+		                <div class="result-content">
+		                    <div class="result-text">${result}</div>
+		                </div>
+		                <div class="result-actions">
+		                    <button class="action-btn copy-btn" onclick="copyResult('${result}')" title="复制">
+		                        <i class="fas fa-copy"></i>
+		                    </button>
+		                    <button class="action-btn delete-btn" onclick="deleteResult('${result}')" title="删除">
+		                        <i class="fas fa-trash-alt"></i>
+		                    </button>
+		                </div>
+		            `;
+
+				resultList.appendChild(row);
+				scannedResults.add(result);
+
+				// 更新计数
+				updateResultsCount();
+
+				// 添加高亮动画
+				setTimeout(() => {
+					row.classList.remove("highlight");
+				}, 1500);
+			}
+
+			// 复制结果
+			function copyResult(text) {
+				navigator.clipboard.writeText(text).then(() => {
+					showNotification("内容已复制到剪贴板");
+				}).catch(err => {
+					showNotification("复制失败: " + err.message);
+				});
+			}
+
+			// 删除结果
+			function deleteResult(result) {
+				scannedResults.delete(result);
+
+				// 从原始URL中删除对应的URL
+				for (const url of rawScannedURLs) {
+					let parts = url.split('.');
+					if (parts.length >= 3 && parts[2].length >= 4) {
+						let lastPart = parts[2].substr(4).replace(/-([A-Za-z])--/g, '($1)-');
+						if (lastPart === result) {
+							rawScannedURLs.delete(url);
+							break;
+						}
+					}
+				}
+
+				refreshResultsList();
+				showNotification("记录已删除");
+			}
+
+			// 清空结果
+			function clearResults() {
+				if (scannedResults.size === 0) {
+					showNotification("没有可清除的记录");
+					return;
+				}
+
+				if (confirm("确定要清空所有扫描结果吗？")) {
+					scannedResults.clear();
+					rawScannedURLs.clear();
+					refreshResultsList();
+					showNotification("所有记录已清空");
+				}
+			}
+
+			// 刷新结果列表
+			function refreshResultsList() {
+				const resultList = document.getElementById("result-list");
+				resultList.innerHTML = "";
+
+				if (scannedResults.size === 0) {
+					document.getElementById("empty-results").style.display = "flex";
+				} else {
+					let index = 1;
+					for (const result of scannedResults) {
+						const row = document.createElement("div");
+						row.className = "result-item";
+						row.innerHTML = `
+		                        <div class="result-index">${index}</div>
+		                        <div class="result-content">
+		                            <div class="result-text">${result}</div>
+		                        </div>
+		                        <div class="result-actions">
+		                            <button class="action-btn copy-btn" onclick="copyResult('${result}')" title="复制">
+		                                <i class="fas fa-copy">复制</i>
+		                            </button>
+		                            <button class="action-btn delete-btn" onclick="deleteResult('${result}')" title="删除">
+		                                <i class="fas fa-trash-alt">删除</i>
+		                            </button>
+		                        </div>
+		                    `;
+						resultList.appendChild(row);
+						index++;
+					}
+				}
+
+				updateResultsCount();
+			}
+
+			// 更新结果计数
+			function updateResultsCount() {
+				document.getElementById("results-count").textContent = scannedResults.size;
+			}
+
+			// 确认提交
+			async function confirmSubmit() {
+				if (rawScannedURLs.size === 0) {
+					showNotification("请先扫码添加产品！");
+					return;
+				}
+
+				// 显示处理中状态
+				document.getElementById("processing-overlay").style.display = "flex";
+
+				try {
+					const ptIDs = []; // 存储所有 ptID 的值
+					const urls = Array.from(rawScannedURLs);
+					const total = urls.length;
+					let processed = 0;
+
+					// 1. 获取所有 ptID
+					for (const url of urls) {
+						// 更新处理状态
+						processed++;
+						document.getElementById("processing-text").textContent =
+							`正在处理产品 ${processed}/${total}...`;
+
+						const secureUrl = url.replace(/^http:\/\//i, 'https://');
+						const response = await fetch(secureUrl);
+						const html = await response.text();
+						const parser = new DOMParser();
+						const doc = parser.parseFromString(html, "text/html");
+						const ptElement = doc.getElementById("ptID");
+
+						if (ptElement) {
+							ptIDs.push(ptElement.textContent.trim());
+						}
+					}
+
+					// 2. 拼接跳转链接
+					const redirectUrl = `https://www.cngoldtex.com/xunjiaxianqk.html?xunjia=array[${ptIDs.join(',')}]`;
+					console.log("跳转链接:", redirectUrl);
+
+					// 3. 跳转到新页面
+					window.location.href = redirectUrl;
+
+				} catch (error) {
+					console.error("提交失败:", error);
+					showNotification(`提交失败: ${error.message}`);
+				} finally {
+					// 隐藏处理中状态
+					document.getElementById("processing-overlay").style.display = "none";
+				}
+			}
+
+			// 显示通知
+			function showNotification(message) {
+				const notification = document.getElementById("notification");
+				const text = document.getElementById("notification-text");
+
+				text.textContent = message;
+				notification.style.display = "flex";
+
+				setTimeout(() => {
+					notification.style.display = "none";
+				}, 3000);
+			}
+
+			// 初始化
+			document.addEventListener('DOMContentLoaded', () => {
+				detectDevice();
+				initCamera();
+				refreshResultsList();
+			});
+		</script>
+	</body>
+</html>
